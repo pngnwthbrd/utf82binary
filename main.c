@@ -44,9 +44,7 @@ int main(int argc, char *argv[]) {
                 sprintf(lbits, "%.4s", byte);
                 sprintf(rbits, "%.4s", &byte[4]); // byte + 4
 
-                // TODO: check what utf-8 prefix has byte, then loop to lbits and rbits
-                // and convert to hex -> utf-8 code point
-
+                // TODO: convert to hex -> utf-8 code point
 
                 if (bytePrefix(Utf8Prefixes.byte1, sizeof(Utf8Prefixes.byte1), byte) == 1) {
                     printf("1 byte Character found!\n");
