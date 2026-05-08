@@ -15,15 +15,17 @@ int colored = 0;
 int infoprint = 0;
 int lineprint = 0;
 
+// utf-8 prefixes
 struct {
     char byte1[2];
     char byte2[4];
     char byte3[5];
     char byte4[6];
     char bytef[3];
-} Utf8Prefixes = {"0", "110", "1110", "11110", "10"};
+} UTF8Pre = {"0", "110", "1110", "11110", "10"};
 
-int bytePrefix(char * prefix, int prefixSize, char byte[9]) {
+// check byte prefix
+int bPre(char * prefix, int prefixSize, char byte[9]) {
     for (int i = 0; i < (prefixSize -1); i++) {
         if (prefix[i] != byte[i]) {
             return 0;
@@ -74,7 +76,7 @@ int main(int argc, char *argv[]) {
 
                 // TODO: convert to hex -> utf-8 code point
 
-                if (bytePrefix(Utf8Prefixes.byte1, sizeof(Utf8Prefixes.byte1), byte) == 1) {
+                if (bPre(UTF8Pre.byte1, sizeof(UTF8Pre.byte1), byte) == 1) {
                     color(COLOR_BOLD_WHITE);
                     printf("%c ", input[i]);
 
@@ -82,7 +84,7 @@ int main(int argc, char *argv[]) {
 
                     color(COLOR_GREEN);
                     printf("<1 byte char>");
-                } else if (bytePrefix(Utf8Prefixes.byte2, sizeof(Utf8Prefixes.byte2), byte) == 1) {
+                } else if (bPre(UTF8Pre.byte2, sizeof(UTF8Pre.byte2), byte) == 1) {
                     color(COLOR_BOLD_WHITE);
                     printf("%c%c ", input[i], input[i + 1]);
 
@@ -90,7 +92,7 @@ int main(int argc, char *argv[]) {
 
                     color(COLOR_YELLOW);
                     printf("<2 byte char>");
-                } else if (bytePrefix(Utf8Prefixes.byte3, sizeof(Utf8Prefixes.byte3), byte) == 1) {
+                } else if (bPre(UTF8Pre.byte3, sizeof(UTF8Pre.byte3), byte) == 1) {
                     color(COLOR_BOLD_WHITE);
                     printf("%c%c%c ", input[i], input[i + 1], input[i + 2]);
 
@@ -98,7 +100,7 @@ int main(int argc, char *argv[]) {
 
                     color(COLOR_BLUE);
                     printf("<3 byte char>");
-                } else if (bytePrefix(Utf8Prefixes.byte4, sizeof(Utf8Prefixes.byte4), byte) == 1) {
+                } else if (bPre(UTF8Pre.byte4, sizeof(UTF8Pre.byte4), byte) == 1) {
                     color(COLOR_BOLD_WHITE);
                     printf("%c%c%c%c ", input[i], input[i + 1], input[i + 2], input[i + 3]);
 
@@ -106,7 +108,7 @@ int main(int argc, char *argv[]) {
 
                     color(COLOR_CYAN);
                     printf("<4 byte char>");
-                } else if (bytePrefix(Utf8Prefixes.bytef, sizeof(Utf8Prefixes.bytef), byte) == 1) {
+                } else if (bPre(UTF8Pre.bytef, sizeof(UTF8Pre.bytef), byte) == 1) {
                     if (lineprint) printf(" \t");
 
                     color(COLOR_PURPLE);
@@ -133,6 +135,7 @@ int main(int argc, char *argv[]) {
         printf("Usage: %s <string>\n", argv[0]);
         printf("Options:\n");
         printf("-i  Show colored byte information\n");
+        printf("-l  Show one line per character\n");
         return 1;
     }
 }
