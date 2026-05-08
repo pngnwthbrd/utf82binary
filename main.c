@@ -13,6 +13,7 @@
 
 int colored = 0;
 int infoprint = 0;
+int lineprint = 0;
 
 struct {
     char byte1[2];
@@ -39,14 +40,17 @@ void color(char * code) {
 
 int main(int argc, char *argv[]) {
     int opt;
-    while ((opt = getopt(argc, argv, "i")) != -1) {
+    while ((opt = getopt(argc, argv, "il")) != -1) {
         switch (opt) {
             case 'i':
                 infoprint = 1;
                 colored = 1;
                 break;
+            case 'l':
+                lineprint = 1;
+                break;
             default:
-                fprintf(stderr, "Usage: %s [-i] <string>\n",
+                fprintf(stderr, "Usage: %s [-i,l] <string>\n",
                        argv[0]);
                 return 1;
         }
@@ -71,40 +75,55 @@ int main(int argc, char *argv[]) {
                 // TODO: convert to hex -> utf-8 code point
 
                 if (bytePrefix(Utf8Prefixes.byte1, sizeof(Utf8Prefixes.byte1), byte) == 1) {
+                    color(COLOR_BOLD_WHITE);
+                    printf("%c ", input[i]);
+
+                    if (lineprint) printf("\t");
+
                     color(COLOR_GREEN);
                     printf("<1 byte char>");
-                    color(COLOR_BOLD_WHITE);
-                    printf("(%c)", input[i]);
                 } else if (bytePrefix(Utf8Prefixes.byte2, sizeof(Utf8Prefixes.byte2), byte) == 1) {
+                    color(COLOR_BOLD_WHITE);
+                    printf("%c%c ", input[i], input[i + 1]);
+
+                    if (lineprint) printf("\t");
+
                     color(COLOR_YELLOW);
                     printf("<2 byte char>");
-                    color(COLOR_BOLD_WHITE);
-                    printf("(%c%c)", input[i], input[i + 1]);
                 } else if (bytePrefix(Utf8Prefixes.byte3, sizeof(Utf8Prefixes.byte3), byte) == 1) {
+                    color(COLOR_BOLD_WHITE);
+                    printf("%c%c%c ", input[i], input[i + 1], input[i + 2]);
+
+                    if (lineprint) printf("\t");
+
                     color(COLOR_BLUE);
                     printf("<3 byte char>");
-                    color(COLOR_BOLD_WHITE);
-                    printf("(%c%c%c)", input[i], input[i + 1], input[i + 2]);
                 } else if (bytePrefix(Utf8Prefixes.byte4, sizeof(Utf8Prefixes.byte4), byte) == 1) {
+                    color(COLOR_BOLD_WHITE);
+                    printf("%c%c%c%c ", input[i], input[i + 1], input[i + 2], input[i + 3]);
+
+                    if (lineprint) printf("\t");
+
                     color(COLOR_CYAN);
                     printf("<4 byte char>");
-                    color(COLOR_BOLD_WHITE);
-                    printf("(%c%c%c%c)", input[i], input[i + 1], input[i + 2], input[i + 3]);
                 } else if (bytePrefix(Utf8Prefixes.bytef, sizeof(Utf8Prefixes.bytef), byte) == 1) {
+                    if (lineprint) printf(" \t");
+
                     color(COLOR_PURPLE);
-                    printf("<Follow up byte>");
+                    printf("<Continuation>");
                 }
 
-                if (input[i] == ' ') {
-                    color(COLOR_RED);
-                    printf("<space>");
-                }
-                
+                if (lineprint) printf("\t");
+
                 color(COLOR_RESET);
             }
             // END_WIP
 
             printf("%s", byte);
+
+            if (infoprint) printf(" ");
+            if (lineprint) printf("\n");
+
             color(COLOR_RESET);
         }
         printf("\n");
