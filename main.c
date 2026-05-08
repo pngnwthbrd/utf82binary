@@ -1,5 +1,17 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <unistd.h>
+
+#define COLOR_YELLOW "\e[0;33m"
+#define COLOR_BLUE "\e[0;34m"
+#define COLOR_GREEN "\e[0;32m"
+#define COLOR_RED "\e[0;31m"
+#define COLOR_CYAN "\e[0;36m"
+#define COLOR_PURPLE "\e[0;35m"
+#define COLOR_RESET "\e[0m"
+
+int colored = 0;
+int infoprint = 0;
 
 struct {
     char byte1[2];
@@ -18,9 +30,29 @@ int bytePrefix(char * prefix, int prefixSize, char byte[9]) {
     return 1;
 }
 
+void color(char * code) {
+    if (colored) {
+        printf(code);
+    }
+}
+
 int main(int argc, char *argv[]) {
+    int opt;
+    while ((opt = getopt(argc, argv, "i")) != -1) {
+        switch (opt) {
+            case 'i':
+                infoprint = 1;
+                colored = 1;
+                break;
+            default:
+                fprintf(stderr, "Usage: %s [-i] <string>\n",
+                       argv[0]);
+                return 1;
+        }
+    }
+
     if (argc > 1) {
-        char * input = argv[1];
+        char * input = argv[argc - 1];
         for (int i = 0; input[i] != '\0'; i++) {
             char byte[9];
             for (int j = 7; j >= 0; j--) {
@@ -28,17 +60,8 @@ int main(int argc, char *argv[]) {
             }
             byte[8] = '\0';
 
-            if (input[i] == ' ') {
-                printf("\n");
-                printf("%s", byte);
-                printf("\n");
-            }
-            printf("%s", byte);
-            printf(" ");
-
-
             // WIP
-            if (argc > 2) {
+            if (infoprint) {
                 char lbits[5];
                 char rbits[5];
                 sprintf(lbits, "%.4s", byte);
@@ -47,26 +70,41 @@ int main(int argc, char *argv[]) {
                 // TODO: convert to hex -> utf-8 code point
 
                 if (bytePrefix(Utf8Prefixes.byte1, sizeof(Utf8Prefixes.byte1), byte) == 1) {
-                    printf("1 byte Character found!\n");
+                    color(COLOR_GREEN);
+                    printf("<1 byte char>");
                 } else if (bytePrefix(Utf8Prefixes.byte2, sizeof(Utf8Prefixes.byte2), byte) == 1) {
-                    printf("2 byte Character found!\n");
+                    color(COLOR_YELLOW);
+                    printf("<2 byte char>");
                 } else if (bytePrefix(Utf8Prefixes.byte3, sizeof(Utf8Prefixes.byte3), byte) == 1) {
-                    printf("3 byte Character found!\n");
+                    color(COLOR_BLUE);
+                    printf("<3 byte char>");
                 } else if (bytePrefix(Utf8Prefixes.byte4, sizeof(Utf8Prefixes.byte4), byte) == 1) {
-                    printf("4 byte Character found!\n");
+                    color(COLOR_CYAN);
+                    printf("<4 byte char>");
                 } else if (bytePrefix(Utf8Prefixes.bytef, sizeof(Utf8Prefixes.bytef), byte) == 1) {
-                    printf("Follow up byte found!\n");
-                } else {
-                    printf("String contains non utf-8 binary: %s\n", byte);
+                    color(COLOR_PURPLE);
+                    printf("<Follow up byte>");
                 }
+
+                if (input[i] == ' ') {
+                    color(COLOR_RED);
+                    printf("<space>");
+                }
+                
+                color(COLOR_RESET);
             }
             // END_WIP
+
+            printf("%s", byte);
+            color(COLOR_RESET);
         }
         printf("\n");
 
         return 0;
     } else {
         printf("Usage: %s <string>\n", argv[0]);
+        printf("Options:\n");
+        printf("-i  Show colored byte information\n");
         return 1;
     }
 }
