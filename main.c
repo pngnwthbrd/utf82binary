@@ -8,6 +8,7 @@
 #define COLOR_RED "\e[0;31m"
 #define COLOR_CYAN "\e[0;36m"
 #define COLOR_PURPLE "\e[0;35m"
+#define COLOR_BOLD_WHITE "\e[1;37m"
 #define COLOR_RESET "\e[0m"
 
 int colored = 0;
@@ -72,15 +73,23 @@ int main(int argc, char *argv[]) {
                 if (bytePrefix(Utf8Prefixes.byte1, sizeof(Utf8Prefixes.byte1), byte) == 1) {
                     color(COLOR_GREEN);
                     printf("<1 byte char>");
+                    color(COLOR_BOLD_WHITE);
+                    printf("(%c)", input[i]);
                 } else if (bytePrefix(Utf8Prefixes.byte2, sizeof(Utf8Prefixes.byte2), byte) == 1) {
                     color(COLOR_YELLOW);
                     printf("<2 byte char>");
+                    color(COLOR_BOLD_WHITE);
+                    printf("(%c%c)", input[i], input[i + 1]);
                 } else if (bytePrefix(Utf8Prefixes.byte3, sizeof(Utf8Prefixes.byte3), byte) == 1) {
                     color(COLOR_BLUE);
                     printf("<3 byte char>");
+                    color(COLOR_BOLD_WHITE);
+                    printf("(%c%c%c)", input[i], input[i + 1], input[i + 2]);
                 } else if (bytePrefix(Utf8Prefixes.byte4, sizeof(Utf8Prefixes.byte4), byte) == 1) {
                     color(COLOR_CYAN);
                     printf("<4 byte char>");
+                    color(COLOR_BOLD_WHITE);
+                    printf("(%c%c%c%c)", input[i], input[i + 1], input[i + 2], input[i + 3]);
                 } else if (bytePrefix(Utf8Prefixes.bytef, sizeof(Utf8Prefixes.bytef), byte) == 1) {
                     color(COLOR_PURPLE);
                     printf("<Follow up byte>");
