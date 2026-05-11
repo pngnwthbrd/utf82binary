@@ -25,7 +25,7 @@ struct {
 } UTF8Pre = {"0", "110", "1110", "11110", "10"};
 
 // check byte prefix
-int bPre(char * prefix, int prefixSize, char byte[9]) {
+static int bPre(char * prefix, int prefixSize, char byte[9]) {
     for (int i = 0; i < (prefixSize -1); i++) {
         if (prefix[i] != byte[i]) {
             return 0;
